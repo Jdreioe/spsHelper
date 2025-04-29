@@ -43,7 +43,7 @@ class _LogScreenState extends State<LogScreen> {
         itemBuilder: (context, index) {
           final log = _logs[index];
           return ListTile(
-            title: Text('${log.event} at ${log.location}'),
+            title: Text('${log.event} ved ${log.location}'),
             subtitle: Text(log.timestamp.toString()),
             trailing: IconButton(
               icon: const Icon(Icons.delete),

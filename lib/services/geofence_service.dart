@@ -59,17 +59,6 @@ class GeofenceService {
 
   Future<void> _loadLocations() async {
     _locations = await _dbService.getLocations();
-    if (_locations.isEmpty) {
-      _locations = [
-        GeofenceLocation(
-          dayOfWeek: 1,
-          latitude: 59.9399,
-          longitude: 10.7215,
-          radius: 100,
-          name: 'University',
-        ),
-      ];
-    }
   }
 
   Future<void> _loadSchedule() async {

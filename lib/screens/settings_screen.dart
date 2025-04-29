@@ -21,6 +21,23 @@ class _SettingsScreenState extends State<SettingsScreen> {
   SchoolSchedule? _schedule;
   bool _isLoading = true;
 
+  String getDayName(int dayOfWeek) {
+    switch (dayOfWeek) {
+      case 1:
+        return 'Mandag';
+      case 2:
+        return 'Tirsdag';
+      case 3:
+        return 'Onsdag';
+      case 4:
+        return 'Torsdag';
+      case 5:
+        return 'Fredag';
+      default:
+        return 'Ukendt';
+    }
+  }
+
   @override
   void initState() {
     super.initState();
@@ -75,7 +92,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       }
     } else if (context.mounted && position == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Unable to get current location. Using default.')),
+        const SnackBar(content: Text('Kan ikke finde din position, vælger standarden')),
       );
     }
   }
@@ -88,32 +105,32 @@ class _SettingsScreenState extends State<SettingsScreen> {
       );
     }
     return Scaffold(
-      appBar: AppBar(title: const Text('Settings')),
+      appBar: AppBar(title: const Text('Indstillinger')),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
           ListTile(
-            title: const Text('School Schedule'),
+            title: const Text('Skema'),
             subtitle: Text(_schedule?.weeklySchedule.isEmpty ?? true
-                ? 'Not set'
-                : 'Set for ${_schedule!.weeklySchedule.length} days'),
+                ? 'Ikke sat'
+                : 'Sat til ${_schedule!.weeklySchedule.length} dage'),
             trailing: const Icon(Icons.edit),
             onTap: _pickSchedule,
           ),
           ListTile(
-            title: const Text('Geofence Locations'),
-            subtitle: Text('${_locations.length} locations set'),
+            title: const Text('Skolens bygninger'),
+            subtitle: Text('${_locations.length} lokationer'),
             trailing: const Icon(Icons.add_location),
             onTap: _pickLocation,
           ),
           const SizedBox(height: 16),
-          const Text('Locations', style: TextStyle(fontWeight: FontWeight.bold)),
+          const Text('Lokationer', style: TextStyle(fontWeight: FontWeight.bold)),
           ..._locations.asMap().entries.map((entry) {
             final index = entry.key;
             final loc = entry.value;
             return ListTile(
-              title: Text('${loc.name} (Day ${loc.dayOfWeek})'),
-              subtitle: Text('Lat: ${loc.latitude}, Lon: ${loc.longitude}, Radius: ${loc.radius}m'),
+                title: Text('${loc.name} (${getDayName(loc.dayOfWeek)})'),
+              subtitle: Text('Latitude: ${loc.latitude}, Longitude: ${loc.longitude}, Radius: ${loc.radius}m'),
               trailing: IconButton(
                 icon: const Icon(Icons.delete),
                 onPressed: () async {
@@ -168,12 +185,12 @@ class _SchedulePickerDialogState extends State<SchedulePickerDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: const Text('Set School Schedule'),
+      title: const Text('Vælg skema'),
       content: SingleChildScrollView(
         child: Column(
-          children: List.generate(7, (index) {
+          children: List.generate(5, (index) {
             final day = index + 1;
-            final dayName = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'][index];
+            final dayName = ['Mandag', 'Tirsdag', 'Onsdag', 'Torsdag', 'Fredag'][index];
             return ExpansionTile(
               title: Text(dayName),
               children: [
@@ -194,7 +211,7 @@ class _SchedulePickerDialogState extends State<SchedulePickerDialog> {
                 }),
                 TextButton(
                   onPressed: () => _addTimeRange(day),
-                  child: const Text('Add Time Range'),
+                  child: const Text('Tilføj tidsrum'),
                 ),
               ],
             );
@@ -204,14 +221,14 @@ class _SchedulePickerDialogState extends State<SchedulePickerDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),
-          child: const Text('Cancel'),
+          child: const Text('Annuler'),
         ),
         TextButton(
           onPressed: () => Navigator.pop(
             context,
             SchoolSchedule(weeklySchedule: _weeklySchedule, isActive: true),
           ),
-          child: const Text('Save'),
+          child: const Text('Gem'),
         ),
       ],
     );
@@ -272,13 +289,13 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
         );
       } else if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('No results found')),
+          const SnackBar(content: Text('Ingen resultater fundet')),
         );
       }
     } catch (e) {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Search failed: $e')),
+          SnackBar(content: Text('Fejl ved søgning: $e')),
         );
       }
     } finally {
@@ -303,7 +320,7 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Pick Location')),
+      appBar: AppBar(title: const Text('Vælg sted')),
       body: Column(
         children: [
           Padding(
@@ -316,7 +333,7 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
                       child: TextField(
                         controller: _searchController,
                         decoration: const InputDecoration(
-                          labelText: 'Search Location',
+                          labelText: 'Søg efter sted',
                           border: OutlineInputBorder(),
                         ),
                         onSubmitted: (_) => _searchLocation(),
@@ -352,7 +369,7 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
                   children: [
                     TileLayer(
                       urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                      userAgentPackageName: 'com.example.app',
+                      userAgentPackageName: 'com.hojmoseit.sps_helper',
                       tileProvider: _tileProvider,
                     ),
                     if (_selectedLatLng != null)
@@ -406,7 +423,7 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
               onPressed: _selectedLatLng != null
                   ? () => Navigator.pop(context, _selectedLatLng)
                   : null,
-              child: const Text('Confirm Location'),
+              child: const Text('Er det her?'),
             ),
           ),
         ],
@@ -442,8 +459,8 @@ class _LocationDetailsDialogState extends State<LocationDetailsDialog> {
         final data = json.decode(response.body);
         final address = data['display_name'] ?? '';
         setState(() {
-          _name = address;
-          _nameController.text = address;
+          //_name = address;
+          //_nameController.text = address;
         });
       }
     });
@@ -458,22 +475,22 @@ class _LocationDetailsDialogState extends State<LocationDetailsDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: const Text('Set Geofence Details'),
+      title: const Text('Detaljer for lokation'),
       content: SingleChildScrollView(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             TextField(
               controller: _nameController,
-              decoration: const InputDecoration(labelText: 'Location Name'),
+              decoration: const InputDecoration(labelText: 'Navn'),
               onChanged: (value) => _name = value,
             ),
             DropdownButton<int>(
               value: _dayOfWeek,
-              items: List.generate(7, (i) => i + 1).map((day) {
+              items: List.generate(5, (i) => i + 1).map((day) {
                 return DropdownMenuItem(
                   value: day,
-                  child: Text(['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'][day - 1]),
+                  child: Text(['Man', 'Tir', 'Ons', 'Tor', 'Fre'][day - 1]),
                 );
               }).toList(),
               onChanged: (value) => setState(() => _dayOfWeek = value!),
@@ -492,7 +509,7 @@ class _LocationDetailsDialogState extends State<LocationDetailsDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),
-          child: const Text('Cancel'),
+          child: const Text('Annuler'),
         ),
         TextButton(
           onPressed: _name.isNotEmpty
@@ -507,7 +524,7 @@ class _LocationDetailsDialogState extends State<LocationDetailsDialog> {
                     ),
                   )
               : null,
-          child: const Text('Save'),
+          child: const Text('Gem'),
         ),
       ],
     );

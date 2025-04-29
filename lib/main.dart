@@ -16,7 +16,7 @@ class GeofenceApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Geofence Logging',
+      title: 'SPS-helper Alpha 0.1',
       theme: ThemeData(
         primarySwatch: Colors.blue,
         useMaterial3: true,
@@ -32,7 +32,7 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Geofence Logging')),
+      appBar: AppBar(title: const Text('SPS-registrerings hjælp Alpha 0.1')),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -42,7 +42,7 @@ class HomeScreen extends StatelessWidget {
                 context,
                 MaterialPageRoute(builder: (_) => const SettingsScreen()),
               ),
-              child: const Text('Settings'),
+              child: const Text('Indstillinger'),
             ),
             const SizedBox(height: 16),
             ElevatedButton(
@@ -50,7 +50,7 @@ class HomeScreen extends StatelessWidget {
                 context,
                 MaterialPageRoute(builder: (_) => const LogScreen()),
               ),
-              child: const Text('View Logs'),
+              child: const Text('Se logs'),
             ),
           ],
         ),
