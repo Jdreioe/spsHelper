@@ -1,7 +1,9 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
+import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import '../models/log_entry.dart';
 import '../models/school_schedule.dart';
 import '../models/geofence_location.dart';
@@ -10,6 +12,10 @@ class DatabaseService {
   Database? _database;
 
   Future<void> initialize() async {
+    if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
+      sqfliteFfiInit();
+      databaseFactory = databaseFactoryFfi;
+    }
     _database = await openDatabase(
       join(await getDatabasesPath(), 'geofence_logs.db'),
       onCreate: (db, version) {

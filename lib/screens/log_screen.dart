@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../services/geofence_service.dart';
 import '../models/log_entry.dart';
+import '../main.dart';
 
 class LogScreen extends StatefulWidget {
   const LogScreen({super.key});
@@ -9,7 +10,7 @@ class LogScreen extends StatefulWidget {
   _LogScreenState createState() => _LogScreenState();
 }
 
-class _LogScreenState extends State<LogScreen> {
+class _LogScreenState extends State<LogScreen> with RouteAware {
   final GeofenceService _geofenceService = GeofenceService();
   List<LogEntry> _logs = [];
 
@@ -19,8 +20,27 @@ class _LogScreenState extends State<LogScreen> {
     _loadLogs();
   }
 
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    routeObserver.subscribe(this, ModalRoute.of(context)!);
+  }
+
+  @override
+  void dispose() {
+    routeObserver.unsubscribe(this);
+    super.dispose();
+  }
+
+  @override
+  void didPopNext() {
+    _loadLogs();
+  }
+
   Future<void> _loadLogs() async {
+    print('--- Loading logs for debug ---');
     final logs = await _geofenceService.getLogs();
+    print('Found ${logs.length} logs.');
     setState(() {
       _logs = logs;
     });
